@@ -5,6 +5,23 @@ Compose can provide outside Kubernetes. It consists of two containers, two pinne
 multi-platform image digests, tracked configuration, health checks and one named
 volume. No production values or real secrets are included.
 
+## Companion article
+
+This repository is the reproducible experiment behind article **#31** on
+[systemebene](https://systemebene.house-harkonnen.com/):
+
+**[GitOps für Docker Compose: Was nach dem ersten funktionierenden Setup noch fehlt](https://systemebene.house-harkonnen.com/artikel/31-gitops-fuer-docker-compose)**
+
+The article uses the measured scenarios in this repository to separate three concepts
+that are often collapsed into one: declarative desired state, automated deployment and
+continuous reconciliation. It also looks at the limits the experiment exposes: a Git
+revert can restore configuration, but it does not automatically roll back persistent
+data; health checks detect a failed release but do not choose a rollback target; and a
+small polling reconciler is useful without becoming a Kubernetes-style controller.
+
+The German article is scheduled for **18 September 2026**. The repository and raw
+results are public independently of the article.
+
 The project deliberately distinguishes three things:
 
 1. **Declarative desired state:** `compose.yaml` plus the tracked config, startup
