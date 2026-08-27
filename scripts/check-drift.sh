@@ -7,6 +7,7 @@ require_docker
 prepare_desired_state
 
 drift_count=0
+policy_count=0
 expected_services=$(compose config --services)
 
 for service in $expected_services; do
@@ -48,14 +49,15 @@ for service in $expected_services; do
     case "$actual_image" in
         *@sha256:*) ;;
         *)
-            printf 'DRIFT service=%s reason=mutable-image-reference actual=%s\n' "$service" "$actual_image"
-            drift_count=$((drift_count + 1))
+            printf 'POLICY service=%s reason=mutable-image-reference actual=%s\n' "$service" "$actual_image"
+            policy_count=$((policy_count + 1))
             ;;
     esac
 done
 
-if [ "$drift_count" -gt 0 ]; then
-    printf 'DRIFT detected count=%s desired_state=%s\n' "$drift_count" "$DESIRED_STATE_SHA"
+if [ "$drift_count" -gt 0 ] || [ "$policy_count" -gt 0 ]; then
+    printf 'OUT_OF_SYNC drift=%s policy=%s desired_state=%s\n' \
+        "$drift_count" "$policy_count" "$DESIRED_STATE_SHA"
     exit 1
 fi
 
