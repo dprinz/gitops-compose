@@ -1,0 +1,237 @@
+2026-08-27T13:24:31Z RUN start project=gitops-compose-test-38935 port=18080
+Client:
+ Version:           29.5.3
+ API version:       1.54
+ Go version:        go1.26.4
+ Git commit:        d1c06ef
+ Built:             Wed Jun  3 17:59:08 2026
+ OS/Arch:           darwin/arm64
+ Context:           desktop-linux
+
+Server: Docker Desktop 4.77.0 (228796)
+ Engine:
+  Version:          29.5.3
+  API version:      1.54 (minimum version 1.40)
+  Go version:       go1.26.4
+  Git commit:       285b471
+  Built:            Wed Jun  3 18:00:14 2026
+  OS/Arch:          linux/arm64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.4
+  GitCommit:        193637f7ee8ae5f5aa5248f49e7baa3e6164966e
+ runc:
+  Version:          1.3.5
+  GitCommit:        v1.3.5-0-g488fc13e
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+Docker Compose version 5.1.4
+Darwin 25.5.0 arm64
+2026-08-27T13:24:32Z BEGIN baseline deploy command=./scripts/deploy.sh
+2026-08-27T13:24:33Z deploy start revision=8c49337dbeef desired_state=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d
+ Network gitops-compose-test-38935_default Creating
+ Network gitops-compose-test-38935_default Created
+ Volume gitops-compose-test-38935_demo-data Creating
+ Volume gitops-compose-test-38935_demo-data Created
+ Container gitops-compose-test-38935-data-1 Creating
+ Container gitops-compose-test-38935-data-1 Created
+ Container gitops-compose-test-38935-web-1 Creating
+ Container gitops-compose-test-38935-web-1 Created
+ Container gitops-compose-test-38935-data-1 Starting
+ Container gitops-compose-test-38935-data-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Healthy
+2026-08-27T13:24:44Z deploy healthy revision=8c49337dbeef desired_state=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      11 seconds ago   Up 11 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       11 seconds ago   Up 5 seconds (healthy)    127.0.0.1:18080->80/tcp
+2026-08-27T13:24:44Z END baseline deploy exit=0 duration=12s
+2026-08-27T13:24:44Z STATE baseline
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      12 seconds ago   Up 12 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       12 seconds ago   Up 6 seconds (healthy)    127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d revision=8c49337dbeef
+service=web status=running health=healthy image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d revision=8c49337dbeef
+2026-08-27T13:24:46Z ASSERT response=gitops-compose release=v1
+{"schema":1,"message":"synthetic persistent data"}
+2026-08-27T13:24:47Z ASSERT persistent_schema=1
+2026-08-27T13:24:47Z BEGIN normal config update command=./scripts/deploy.sh
+2026-08-27T13:24:47Z deploy start revision=e1b8a133aace desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+ Container gitops-compose-test-38935-data-1 Recreate
+ Container gitops-compose-test-38935-data-1 Recreated
+ Container gitops-compose-test-38935-web-1 Recreate
+ Container gitops-compose-test-38935-web-1 Recreated
+ Container gitops-compose-test-38935-data-1 Starting
+ Container gitops-compose-test-38935-data-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Healthy
+2026-08-27T13:24:59Z deploy healthy revision=e1b8a133aace desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      12 seconds ago   Up 11 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       12 seconds ago   Up 5 seconds (healthy)    127.0.0.1:18080->80/tcp
+2026-08-27T13:24:59Z END normal config update exit=0 duration=12s
+2026-08-27T13:24:59Z STATE config-v2
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      13 seconds ago   Up 12 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       13 seconds ago   Up 6 seconds (healthy)    127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=e1b8a133aace
+service=web status=running health=healthy image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=e1b8a133aace
+2026-08-27T13:25:00Z ASSERT response=gitops-compose release=v2
+2026-08-27T13:25:00Z BEGIN intentional runtime drift command=./scripts/compose.sh stop web
+ Container gitops-compose-test-38935-web-1 Stopping
+ Container gitops-compose-test-38935-web-1 Stopped
+2026-08-27T13:25:01Z END intentional runtime drift exit=0 duration=1s
+2026-08-27T13:25:01Z BEGIN detect stopped web drift command=./scripts/check-drift.sh
+DRIFT service=web reason=status expected=running actual=exited
+DRIFT service=web reason=health expected=healthy actual=unhealthy
+DRIFT detected count=2 desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+2026-08-27T13:25:02Z END detect stopped web drift exit=1 duration=1s
+2026-08-27T13:25:02Z BEGIN reconcile stopped web command=./scripts/reconcile.sh --once
+DRIFT service=web reason=status expected=running actual=exited
+DRIFT service=web reason=health expected=healthy actual=unhealthy
+DRIFT detected count=2 desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+2026-08-27T13:25:03Z reconcile applying desired state
+2026-08-27T13:25:03Z deploy start revision=e1b8a133aace desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+ Container gitops-compose-test-38935-data-1 Running
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Healthy
+2026-08-27T13:25:09Z deploy healthy revision=e1b8a133aace desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      22 seconds ago   Up 21 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       22 seconds ago   Up 5 seconds (healthy)    127.0.0.1:18080->80/tcp
+IN_SYNC services=2 desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=e1b8a133aace
+2026-08-27T13:25:10Z END reconcile stopped web exit=0 duration=8s
+2026-08-27T13:25:10Z STATE reconciled
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      23 seconds ago   Up 22 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       23 seconds ago   Up 6 seconds (healthy)    127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=e1b8a133aace
+service=web status=running health=healthy image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=e1b8a133aace
+2026-08-27T13:25:11Z ASSERT response=gitops-compose release=v2
+2026-08-27T13:25:11Z BEGIN intentional health-check failure command=HEALTH_TIMEOUT=12 ./scripts/deploy.sh
+2026-08-27T13:25:11Z deploy start revision=6f227660001f desired_state=857d8fa91268b8fea00a192d80c37cdd562b27b8cc1bd38c3dbfa7888f39fb8b
+ Container gitops-compose-test-38935-data-1 Recreate
+ Container gitops-compose-test-38935-data-1 Recreated
+ Container gitops-compose-test-38935-web-1 Recreate
+ Container gitops-compose-test-38935-web-1 Recreated
+ Container gitops-compose-test-38935-data-1 Starting
+ Container gitops-compose-test-38935-data-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+application not healthy after 12s
+2026-08-27T13:25:29Z END intentional health-check failure exit=1 duration=18s
+2026-08-27T13:25:29Z STATE unhealthy-release
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                             PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      19 seconds ago   Up 18 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       19 seconds ago   Up 12 seconds (health: starting)   127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=857d8fa91268b8fea00a192d80c37cdd562b27b8cc1bd38c3dbfa7888f39fb8b revision=6f227660001f
+service=web status=running health=starting image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=857d8fa91268b8fea00a192d80c37cdd562b27b8cc1bd38c3dbfa7888f39fb8b revision=6f227660001f
+[master 79fad5a] Revert "experiment: intentional unhealthy release"
+ Date: Thu Aug 27 15:25:30 2026 +0200
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+2026-08-27T13:25:31Z BEGIN recover bad release by Git revert command=git revert <bad-commit> && ./scripts/deploy.sh
+2026-08-27T13:25:31Z deploy start revision=79fad5a28dc0 desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+ Container gitops-compose-test-38935-data-1 Recreate
+ Container gitops-compose-test-38935-data-1 Recreated
+ Container gitops-compose-test-38935-web-1 Recreate
+ Container gitops-compose-test-38935-web-1 Recreated
+ Container gitops-compose-test-38935-data-1 Starting
+ Container gitops-compose-test-38935-data-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Healthy
+2026-08-27T13:25:42Z deploy healthy revision=79fad5a28dc0 desired_state=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      11 seconds ago   Up 11 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       11 seconds ago   Up 5 seconds (healthy)    127.0.0.1:18080->80/tcp
+2026-08-27T13:25:43Z END recover bad release by Git revert exit=0 duration=12s
+2026-08-27T13:25:43Z STATE recovered-v2
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      12 seconds ago   Up 12 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       12 seconds ago   Up 6 seconds (healthy)    127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=79fad5a28dc0
+service=web status=running health=healthy image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=bc26f5333ee98eaa5fb9a125f4e2bb65e4a31fb4fd1f41ef7d4725cd19f154d9 revision=79fad5a28dc0
+2026-08-27T13:25:44Z ASSERT response=gitops-compose release=v2
+2026-08-27T13:25:44Z BEGIN persistent data migration command=./scripts/migrate-data.sh up
+migrated persistent data from schema 1 to schema 2
+2026-08-27T13:25:44Z END persistent data migration exit=0 duration=0s
+{"schema":2,"payload":{"message":"synthetic persistent data"}}
+2026-08-27T13:25:45Z ASSERT persistent_schema=2
+[master 417ab32] Revert "release: switch response to v2"
+ Date: Thu Aug 27 15:25:45 2026 +0200
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+2026-08-27T13:25:45Z BEGIN configuration rollback to v1 command=git revert <v2-commit> && ./scripts/deploy.sh
+2026-08-27T13:25:45Z deploy start revision=417ab328048b desired_state=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d
+ Container gitops-compose-test-38935-data-1 Recreate
+ Container gitops-compose-test-38935-data-1 Recreated
+ Container gitops-compose-test-38935-web-1 Recreate
+ Container gitops-compose-test-38935-web-1 Recreated
+ Container gitops-compose-test-38935-data-1 Starting
+ Container gitops-compose-test-38935-data-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Starting
+ Container gitops-compose-test-38935-web-1 Started
+ Container gitops-compose-test-38935-data-1 Waiting
+ Container gitops-compose-test-38935-web-1 Waiting
+ Container gitops-compose-test-38935-data-1 Healthy
+ Container gitops-compose-test-38935-web-1 Healthy
+2026-08-27T13:25:56Z deploy healthy revision=417ab328048b desired_state=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      12 seconds ago   Up 11 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       12 seconds ago   Up 5 seconds (healthy)    127.0.0.1:18080->80/tcp
+2026-08-27T13:25:57Z END configuration rollback to v1 exit=0 duration=12s
+2026-08-27T13:25:57Z STATE rolled-back-config
+NAME                               IMAGE                                                                                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+gitops-compose-test-38935-data-1   alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c         "/bin/sh /opt/demo/d…"   data      12 seconds ago   Up 12 seconds (healthy)
+gitops-compose-test-38935-web-1    nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10   "/docker-entrypoint.…"   web       12 seconds ago   Up 6 seconds (healthy)    127.0.0.1:18080->80/tcp
+service=data status=running health=healthy image=alpine:3.21.3@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c desired=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d revision=417ab328048b
+service=web status=running health=healthy image=nginx:1.27.5-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 desired=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d revision=417ab328048b
+2026-08-27T13:25:58Z ASSERT response=gitops-compose release=v1
+{"schema":2,"payload":{"message":"synthetic persistent data"}}
+2026-08-27T13:25:58Z ASSERT persistent_schema=2
+2026-08-27T13:25:58Z BEGIN final drift check command=./scripts/check-drift.sh
+IN_SYNC services=2 desired_state=31cf12acb6298a28f6578e4a6f9d8dab2873249741176f8d982afca12dc7168d revision=417ab328048b
+2026-08-27T13:25:59Z END final drift check exit=0 duration=1s
+2026-08-27T13:25:59Z PASS all experiments completed results=results/latest.md
+ Container gitops-compose-test-38935-web-1 Stopping
+ Container gitops-compose-test-38935-web-1 Stopped
+ Container gitops-compose-test-38935-web-1 Removing
+ Container gitops-compose-test-38935-web-1 Removed
+ Container gitops-compose-test-38935-data-1 Stopping
+ Container gitops-compose-test-38935-data-1 Stopped
+ Container gitops-compose-test-38935-data-1 Removing
+ Container gitops-compose-test-38935-data-1 Removed
+ Network gitops-compose-test-38935_default Removing
+ Volume gitops-compose-test-38935_demo-data Removing
+ Volume gitops-compose-test-38935_demo-data Removed
+ Network gitops-compose-test-38935_default Removed

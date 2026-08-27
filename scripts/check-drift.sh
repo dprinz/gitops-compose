@@ -1,0 +1,65 @@
+#!/bin/sh
+
+set -eu
+. "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/lib.sh"
+
+require_docker
+prepare_desired_state
+
+drift_count=0
+expected_services=$(compose config --services)
+
+for service in $expected_services; do
+    container_id=$(compose ps --all --quiet "$service")
+    if [ -z "$container_id" ]; then
+        printf 'DRIFT service=%s reason=missing-container\n' "$service"
+        drift_count=$((drift_count + 1))
+        continue
+    fi
+
+    status=$(docker inspect --format '{{.State.Status}}' "$container_id")
+    if [ "$status" != running ]; then
+        printf 'DRIFT service=%s reason=status expected=running actual=%s\n' "$service" "$status"
+        drift_count=$((drift_count + 1))
+    fi
+
+    health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$container_id")
+    if [ "$health" != healthy ]; then
+        printf 'DRIFT service=%s reason=health expected=healthy actual=%s\n' "$service" "$health"
+        drift_count=$((drift_count + 1))
+    fi
+
+    actual_hash=$(docker inspect --format '{{index .Config.Labels "demo.gitops.desired-state"}}' "$container_id")
+    if [ "$actual_hash" != "$DESIRED_STATE_SHA" ]; then
+        printf 'DRIFT service=%s reason=desired-state-label expected=%s actual=%s\n' \
+            "$service" "$DESIRED_STATE_SHA" "${actual_hash:-missing}"
+        drift_count=$((drift_count + 1))
+    fi
+
+    expected_config_hash=$(compose config --hash "$service" | awk -v name="$service" '$1 == name { print $2 }')
+    actual_config_hash=$(docker inspect --format '{{index .Config.Labels "com.docker.compose.config-hash"}}' "$container_id")
+    if [ -z "$expected_config_hash" ] || [ "$actual_config_hash" != "$expected_config_hash" ]; then
+        printf 'DRIFT service=%s reason=compose-config-hash expected=%s actual=%s\n' \
+            "$service" "${expected_config_hash:-missing}" "${actual_config_hash:-missing}"
+        drift_count=$((drift_count + 1))
+    fi
+
+    actual_image=$(docker inspect --format '{{.Config.Image}}' "$container_id")
+    case "$actual_image" in
+        *@sha256:*) ;;
+        *)
+            printf 'DRIFT service=%s reason=mutable-image-reference actual=%s\n' "$service" "$actual_image"
+            drift_count=$((drift_count + 1))
+            ;;
+    esac
+done
+
+if [ "$drift_count" -gt 0 ]; then
+    printf 'DRIFT detected count=%s desired_state=%s\n' "$drift_count" "$DESIRED_STATE_SHA"
+    exit 1
+fi
+
+printf 'IN_SYNC services=%s desired_state=%s revision=%s\n' \
+    "$(printf '%s\n' "$expected_services" | wc -l | tr -d ' ')" \
+    "$DESIRED_STATE_SHA" \
+    "$DESIRED_REVISION"
