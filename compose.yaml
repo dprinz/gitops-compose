@@ -12,7 +12,6 @@ services:
       - demo_token
     labels:
       demo.gitops.desired-state: ${DESIRED_STATE_SHA:?run commands through scripts/compose.sh}
-      demo.gitops.revision: ${DESIRED_REVISION:?run commands through scripts/compose.sh}
       demo.gitops.service: data
     healthcheck:
       test: ["CMD-SHELL", "test -s /run/secrets/demo_token && test -s /data/record.json && grep -Eq '\"schema\":[[:space:]]*[12]' /data/record.json"]
@@ -34,7 +33,6 @@ services:
       - demo-data:/srv/demo-data:ro
     labels:
       demo.gitops.desired-state: ${DESIRED_STATE_SHA:?run commands through scripts/compose.sh}
-      demo.gitops.revision: ${DESIRED_REVISION:?run commands through scripts/compose.sh}
       demo.gitops.service: web
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/health | grep -q '^ok$'"]
