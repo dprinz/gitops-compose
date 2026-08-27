@@ -64,14 +64,14 @@ run_logged() {
 
 record_state() {
     label=$1
-    log "STATE $label"
+    log "STATE $label revision=$(git -C "$demo_root" rev-parse --short=12 HEAD)"
     (
         cd "$demo_root"
         COMPOSE_PROJECT_NAME="$project_name" APP_PORT="$test_port" ./scripts/compose.sh ps --all
         for service in data web; do
             container_id=$(COMPOSE_PROJECT_NAME="$project_name" APP_PORT="$test_port" ./scripts/compose.sh ps --all --quiet "$service")
             if [ -n "$container_id" ]; then
-                docker inspect --format 'service={{index .Config.Labels "com.docker.compose.service"}} status={{.State.Status}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} image={{.Config.Image}} desired={{index .Config.Labels "demo.gitops.desired-state"}} revision={{index .Config.Labels "demo.gitops.revision"}}' "$container_id"
+                docker inspect --format 'service={{index .Config.Labels "com.docker.compose.service"}} status={{.State.Status}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} image={{.Config.Image}} desired={{index .Config.Labels "demo.gitops.desired-state"}}' "$container_id"
             fi
         done
     ) >>"$log_file" 2>&1
@@ -177,7 +177,7 @@ record_state rolled-back-config
 assert_response 'gitops-compose release=v1'
 assert_schema 2
 
-run_logged "final drift check" "./scripts/check-drift.sh" env COMPOSE_PROJECT_NAME="$project_name" APP_PORT="$test_port" "$demo_root/scripts/check-drift.sh" || fail "final state has drift"
+run_logged "final drift check" "./scripts/check-drift.sh" env COMPOSE_PROJECT_NAME="$project_name" APP_PORT="$test_port" "$demo_root/scripts/check-drift.sh" || fail "final state has drift or policy violations"
 
 cat > "$latest_file" <<EOF
 # Latest experiment result
@@ -197,7 +197,7 @@ cat > "$latest_file" <<EOF
 - Recovery by Git revert: ${health_recovery_seconds}s
 - Configuration rollback to v1: ${config_rollback_seconds}s
 - Persistent schema after configuration rollback: 2 (unchanged)
-- Final drift check: in sync
+- Final drift/policy check: in sync
 - Full log: [run-$run_stamp.log](run-$run_stamp.log)
 
 The durations above are observations from this run, not general guarantees.
