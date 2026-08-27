@@ -30,10 +30,20 @@ for service in $expected_services; do
         drift_count=$((drift_count + 1))
     fi
 
+    case "$service" in
+        data) expected_desired_hash=$DATA_DESIRED_STATE_SHA ;;
+        web) expected_desired_hash=$WEB_DESIRED_STATE_SHA ;;
+        *)
+            printf 'POLICY service=%s reason=unknown-service\n' "$service"
+            policy_count=$((policy_count + 1))
+            continue
+            ;;
+    esac
+
     actual_hash=$(docker inspect --format '{{index .Config.Labels "demo.gitops.desired-state"}}' "$container_id")
-    if [ "$actual_hash" != "$DESIRED_STATE_SHA" ]; then
+    if [ "$actual_hash" != "$expected_desired_hash" ]; then
         printf 'DRIFT service=%s reason=desired-state-label expected=%s actual=%s\n' \
-            "$service" "$DESIRED_STATE_SHA" "${actual_hash:-missing}"
+            "$service" "$expected_desired_hash" "${actual_hash:-missing}"
         drift_count=$((drift_count + 1))
     fi
 
