@@ -25,15 +25,10 @@ hash_stdin() {
     fi
 }
 
-desired_state_sha() {
+hash_files() {
     (
         cd "$ROOT_DIR"
-        for desired_file in \
-            compose.yaml \
-            config/nginx.conf \
-            scripts/data-service.sh \
-            secrets/demo-token.txt
-        do
+        for desired_file in "$@"; do
             test -f "$desired_file" || {
                 printf 'missing desired-state file: %s\n' "$desired_file" >&2
                 exit 2
@@ -43,6 +38,27 @@ desired_state_sha() {
             cat "$desired_file"
         done
     ) | hash_stdin
+}
+
+desired_state_sha() {
+    hash_files \
+        compose.yaml \
+        config/nginx.conf \
+        scripts/data-service.sh \
+        secrets/demo-token.txt
+}
+
+data_desired_state_sha() {
+    hash_files \
+        compose.yaml \
+        scripts/data-service.sh \
+        secrets/demo-token.txt
+}
+
+web_desired_state_sha() {
+    hash_files \
+        compose.yaml \
+        config/nginx.conf
 }
 
 desired_revision() {
@@ -61,8 +77,10 @@ desired_revision() {
 
 prepare_desired_state() {
     DESIRED_STATE_SHA=$(desired_state_sha)
+    DATA_DESIRED_STATE_SHA=$(data_desired_state_sha)
+    WEB_DESIRED_STATE_SHA=$(web_desired_state_sha)
     DESIRED_REVISION=$(desired_revision)
-    export DESIRED_STATE_SHA DESIRED_REVISION
+    export DESIRED_STATE_SHA DATA_DESIRED_STATE_SHA WEB_DESIRED_STATE_SHA DESIRED_REVISION
 }
 
 compose() {
@@ -83,7 +101,7 @@ require_docker() {
         exit 2
     }
     docker compose version >/dev/null 2>&1 || {
-        printf 'Docker Compose v2 is required\n' >&2
+        printf 'the docker compose CLI is required\n' >&2
         exit 2
     }
 }
