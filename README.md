@@ -1,9 +1,15 @@
 # GitOps-like reconciliation with Docker Compose
 
-This is a small, synthetic experiment for testing which GitOps properties Docker
-Compose can provide outside Kubernetes. It consists of two containers, two pinned
-multi-platform image digests, tracked configuration, health checks and one named
-volume. No production values or real secrets are included.
+This is a small, synthetic experiment for testing which GitOps properties can be
+implemented around Docker Compose outside Kubernetes. It consists of two containers,
+two pinned multi-platform image digests, tracked configuration, health checks and one
+named volume. No production values or real secrets are included.
+
+The project intentionally calls itself **GitOps-like** rather than claiming that
+Docker Compose itself is a GitOps system. According to the OpenGitOps principles, a
+GitOps-managed system is declarative, versioned and immutable, pulled automatically,
+and continuously reconciled. This repository implements those properties only to the
+extent described below.
 
 ## Companion article
 
@@ -12,27 +18,41 @@ This repository is the reproducible experiment behind article **#31** on
 
 **[GitOps für Docker Compose: Was nach dem ersten funktionierenden Setup noch fehlt](https://systemebene.house-harkonnen.com/artikel/31-gitops-fuer-docker-compose)**
 
-The article uses the measured scenarios in this repository to separate three concepts
-that are often collapsed into one: declarative desired state, automated deployment and
-continuous reconciliation. It also looks at the limits the experiment exposes: a Git
-revert can restore configuration, but it does not automatically roll back persistent
-data; health checks detect a failed release but do not choose a rollback target; and a
-small polling reconciler is useful without becoming a Kubernetes-style controller.
+The article uses the measured scenarios in this repository to separate concepts that
+are often collapsed into one: declarative desired state, deployment automation,
+drift detection and continuous reconciliation. It also looks at limits exposed by
+the experiment: a Git revert can restore configuration, but it does not automatically
+roll back persistent data; health checks detect a failed release but do not choose a
+rollback target; and a small polling reconciler is useful without becoming a
+Kubernetes-style controller.
 
 The German article is scheduled for **18 September 2026**. The repository and raw
 results are public independently of the article.
 
-The project deliberately distinguishes three things:
+## What is implemented
 
-1. **Declarative desired state:** `compose.yaml` plus the tracked config, startup
-   script and demo secret.
-2. **Automated deployment:** `scripts/deploy.sh` applies that state and waits for
-   both health checks.
-3. **Reconciliation:** `scripts/reconcile.sh --watch 30` repeatedly detects and
-   repairs runtime drift. Reconciliation exists only while that process is running.
+1. **Declarative desired state:** `compose.yaml` plus tracked configuration, startup
+   script and synthetic demo secret.
+2. **Versioned and immutable references:** the repository is versioned in Git and
+   both container images are pinned by digest.
+3. **Deployment automation:** `scripts/deploy.sh` applies the local checkout and waits
+   for both health checks.
+4. **Drift detection:** `scripts/check-drift.sh` compares the running services with
+   the local desired state.
+5. **Reconciliation:** `scripts/reconcile.sh --watch 30` repeatedly checks and repairs
+   runtime drift against the current local checkout.
+6. **Optional pull before reconciliation:** with `RECONCILE_PULL=1`, the reconciler
+   first runs `git pull --ff-only`, then compares and applies the resulting local
+   desired state.
 
-A webhook that only runs `deploy.sh` is deployment automation, not continuous
-reconciliation.
+That distinction matters: `--watch` without `RECONCILE_PULL=1` continuously
+reconciles runtime state against the **already local** Git checkout, but it does not
+notice remote commits by itself. A webhook that only runs `deploy.sh` is deployment
+automation, not continuous reconciliation.
+
+The drift checker also enforces one reproducibility policy: a runtime image reference
+must contain a digest. A mutable image reference is reported as `POLICY`, not as
+runtime drift.
 
 ## Stack
 
@@ -41,19 +61,29 @@ reconciliation.
 | `web` | `nginx:1.27.5-alpine@sha256:65645c...` | Serves the tracked release response and persistent record | HTTP `/health` returns `ok` |
 | `data` | `alpine:3.21.3@sha256:a8560b...` | Initializes and holds a synthetic JSON record in a named volume | secret and schema 1/2 record exist |
 
-The full digests are in `compose.yaml`. A content hash over the desired-state files
-is added to both containers as `demo.gitops.desired-state`. The drift checker also
-compares runtime status, health, Compose's per-service config hash and verifies that
-the runtime image reference contains a digest.
+The full digests are in `compose.yaml`. A content hash over the desired-state files is
+added to both containers as `demo.gitops.desired-state`. The Git revision is logged by
+the deployment tooling, but is deliberately not part of the runtime Compose model; a
+README-only commit should not recreate containers.
+
+The drift checker compares runtime status, health, the desired-state label and
+Compose's per-service config hash. It separately checks that the runtime image
+reference is digest-pinned.
 
 ## Requirements
 
-- Docker Engine or Docker Desktop with `docker compose` v2
+- Docker Engine or Docker Desktop
+- the `docker compose` CLI with support for `up --wait`, `up --wait-timeout` and
+  `config --hash`
 - Git, `curl`, `tar` and a POSIX-compatible shell
 - enough local capacity for two Alpine-based images
 
-The published port binds to `127.0.0.1` only. Override it with `APP_PORT`, for
-example `APP_PORT=18080 ./scripts/deploy.sh`.
+The recorded run in `results/` used Docker Desktop 4.77.0, Docker Engine 29.5.3 and
+Docker Compose 5.1.4 on Darwin/arm64. Other supported Compose versions may behave the
+same qualitatively, but the recorded timings apply only to that run.
+
+The published port binds to `127.0.0.1` only. Override it with `APP_PORT`, for example
+`APP_PORT=18080 ./scripts/deploy.sh`.
 
 ## Quick start
 
@@ -65,7 +95,7 @@ curl http://127.0.0.1:8080/data
 ```
 
 Use `scripts/compose.sh` instead of raw `docker compose`; it calculates the desired
-state hash and revision required by the Compose labels.
+state hash and revision used by the helper scripts.
 
 Stop the stack without deleting its data:
 
@@ -100,8 +130,8 @@ The scenarios are:
 6. migrate persistent data to schema 2;
 7. revert the web configuration to v1 and prove the data remains schema 2.
 
-See [the latest measured run](results/latest.md) after running the suite. Durations
-are observations from that machine and run; they are not timing guarantees.
+See [the latest measured run](results/latest.md). Durations are observations from that
+machine and run; they are not timing guarantees.
 
 ## Individual scenarios
 
@@ -113,27 +143,36 @@ are observations from that machine and run; they are not timing guarantees.
 ./scripts/reconcile.sh --once  # starts it and waits until healthy
 ```
 
-For continuous polling reconciliation:
+For continuous polling reconciliation against the local checkout:
 
 ```sh
 ./scripts/reconcile.sh --watch 30
 ```
 
-Set `RECONCILE_PULL=1` to run `git pull --ff-only` before each iteration. The
-reconciler refuses to pull over tracked local changes. This is a simple pull-based
-agent, not a controller with transactions, admission policy or cluster-level APIs.
+To pull the remote branch before each iteration:
+
+```sh
+RECONCILE_PULL=1 ./scripts/reconcile.sh --watch 30
+```
+
+The reconciler uses `git pull --ff-only` and refuses to pull over tracked local
+changes. This is a deliberately small pull-based agent, not a controller with
+transactions, admission policy, distributed locking or cluster-level APIs.
 
 ### Health-check failure and configuration rollback
 
 The test fixture `tests/fixtures/nginx.unhealthy.conf` returns HTTP 503 from
-`/health`. Applying it makes `deploy.sh` return non-zero after `HEALTH_TIMEOUT`; the
-unhealthy container is left available for inspection. Deployment does not silently
-claim success and does not guess a rollback target. Total wall-clock duration also
-includes container recreation, dependency checks and Compose overhead, so it can be
-longer than the configured health timeout.
+`/health`. `deploy.sh` uses `docker compose up --wait --wait-timeout` and therefore
+returns non-zero when the project does not become healthy in time. The unhealthy
+container is left available for inspection. Deployment does not silently claim
+success and does not guess a rollback target.
 
-In a real clone, use an auditable Git operation to restore the previous desired
-state, then deploy it:
+Total wall-clock duration can be longer than `HEALTH_TIMEOUT` because container
+recreation, dependency health and Compose overhead occur around the wait itself. In
+the recorded run, a 12-second wait timeout resulted in an 18-second total failed
+deployment.
+
+Use an auditable Git operation to restore the previous desired state, then deploy it:
 
 ```sh
 git revert <bad-configuration-commit>
@@ -148,23 +187,26 @@ git revert <bad-configuration-commit>
 ./scripts/migrate-data.sh status
 ```
 
-Reverting Compose or Nginx configuration does not change the named volume. The
-reason and the separately guarded demo restore are documented in
+Reverting Compose or Nginx configuration does not change the named volume. The reason
+and the separately guarded demo restore are documented in
 [`docs/data-migration.md`](docs/data-migration.md).
 
 ## What this can and cannot guarantee
 
-With the polling reconciler running, the demo can detect a missing/stopped/unhealthy
-service, a desired-state label mismatch, a Compose config-hash mismatch and a
-mutable runtime image reference, then ask Compose to recreate or restart services.
-Digest pins prevent a registry tag from silently selecting different bytes.
+With the polling reconciler running, the demo can detect a missing, stopped or
+unhealthy service and mismatches in the tracked runtime configuration, then ask
+Compose to re-apply the local desired state. Digest pins make the referenced image
+content immutable. With `RECONCILE_PULL=1`, the loop also fast-forwards the local
+checkout before reconciliation when possible.
 
 It does **not** provide atomic multi-service rollout, zero downtime, distributed
-locking, policy admission, signed-source verification, automatic rollback choice,
-or persistent-data rollback. Anyone with Docker access can also spoof labels or
-alter host files; the checker is an experiment, not a security boundary. A stopped
-reconciler provides no ongoing convergence. Compose health checks show declared
-process health, not business correctness.
+locking, policy admission, signed-source verification, automatic rollback choice or
+persistent-data rollback. It also does not make host access a security boundary:
+anyone with Docker or filesystem access can interfere with the checker itself or with
+state outside its model. A stopped reconciler provides no ongoing convergence, and a
+Compose health check represents the health condition defined by this project, not
+arbitrary business correctness.
 
-Those boundaries are the article's handoff: desired state, deployment automation
-and reconciliation are related, but they are not interchangeable.
+Those boundaries are the point of the experiment: desired state, deployment
+automation, drift detection and reconciliation are related, but they are not
+interchangeable.
