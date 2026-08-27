@@ -61,14 +61,22 @@ runtime drift.
 | `web` | `nginx:1.27.5-alpine@sha256:65645c...` | Serves the tracked release response and persistent record | HTTP `/health` returns `ok` |
 | `data` | `alpine:3.21.3@sha256:a8560b...` | Initializes and holds a synthetic JSON record in a named volume | secret and schema 1/2 record exist |
 
-The full digests are in `compose.yaml`. A content hash over the desired-state files is
-added to both containers as `demo.gitops.desired-state`. The Git revision is logged by
-the deployment tooling, but is deliberately not part of the runtime Compose model; a
-README-only commit should not recreate containers.
+The full digests are in `compose.yaml`. Each service gets its own
+`demo.gitops.desired-state` hash over the files that can actually affect that service:
 
-The drift checker compares runtime status, health, the desired-state label and
-Compose's per-service config hash. It separately checks that the runtime image
-reference is digest-pinned.
+- `web`: `compose.yaml` and `config/nginx.conf`
+- `data`: `compose.yaml`, `scripts/data-service.sh` and `secrets/demo-token.txt`
+
+This is deliberately service-specific. An earlier version used one global hash for
+both services, which meant an Nginx-only configuration change also recreated the
+`data` container. The current model avoids that unnecessary coupling.
+
+The Git revision is logged by the deployment tooling, but is deliberately not part of
+the runtime Compose model; a README-only commit should not recreate containers.
+
+The drift checker compares runtime status, health, the service-specific desired-state
+label and Compose's per-service config hash. It separately checks that the runtime
+image reference is digest-pinned.
 
 ## Requirements
 
@@ -78,9 +86,11 @@ reference is digest-pinned.
 - Git, `curl`, `tar` and a POSIX-compatible shell
 - enough local capacity for two Alpine-based images
 
-The recorded run in `results/` used Docker Desktop 4.77.0, Docker Engine 29.5.3 and
-Docker Compose 5.1.4 on Darwin/arm64. Other supported Compose versions may behave the
-same qualitatively, but the recorded timings apply only to that run.
+The preserved reference run in `results/` used Docker Desktop 4.77.0, Docker Engine
+29.5.3 and Docker Compose 5.1.4 on Darwin/arm64. It was produced before the
+service-specific hash refactor described above. Its qualitative scenarios remain the
+basis for the article, but its timings must not be treated as measurements of the
+current implementation.
 
 The published port binds to `127.0.0.1` only. Override it with `APP_PORT`, for example
 `APP_PORT=18080 ./scripts/deploy.sh`.
@@ -95,7 +105,7 @@ curl http://127.0.0.1:8080/data
 ```
 
 Use `scripts/compose.sh` instead of raw `docker compose`; it calculates the desired
-state hash and revision used by the helper scripts.
+state hashes and revision used by the helper scripts.
 
 Stop the stack without deleting its data:
 
@@ -130,8 +140,8 @@ The scenarios are:
 6. migrate persistent data to schema 2;
 7. revert the web configuration to v1 and prove the data remains schema 2.
 
-See [the latest measured run](results/latest.md). Durations are observations from that
-machine and run; they are not timing guarantees.
+See [the preserved reference run](results/latest.md). Run the suite again to create a
+fresh result for the current implementation.
 
 ## Individual scenarios
 
@@ -169,8 +179,8 @@ success and does not guess a rollback target.
 
 Total wall-clock duration can be longer than `HEALTH_TIMEOUT` because container
 recreation, dependency health and Compose overhead occur around the wait itself. In
-the recorded run, a 12-second wait timeout resulted in an 18-second total failed
-deployment.
+the preserved reference run, a 12-second wait timeout resulted in an 18-second total
+failed deployment.
 
 Use an auditable Git operation to restore the previous desired state, then deploy it:
 
